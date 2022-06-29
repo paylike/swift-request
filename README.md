@@ -1,3 +1,3 @@
 # PaylikeRequest
 
-A description of this package.
+Request implementation for Swift
