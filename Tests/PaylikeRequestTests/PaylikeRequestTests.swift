@@ -2,10 +2,10 @@ import XCTest
 @testable import PaylikeRequest
 
 final class PaylikeRequestTests: XCTestCase {
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-        XCTAssertEqual(PaylikeRequest().text, "Hello, World!")
+    func testExecution() async throws {
+        let requester = PaylikeRequester()
+        let response = try await requester.request(endpoint: "https://random-data-api.com/api/users/random_user")
+        let body = try response.getJSONBody()
+        XCTAssertNotNil(body)
     }
 }
