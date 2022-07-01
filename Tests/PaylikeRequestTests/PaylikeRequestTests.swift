@@ -108,4 +108,44 @@ final class PaylikeRequestTests: XCTestCase {
         wait(for: [valueExpectation], timeout: 30)
         server.stop()
     }
+    
+    func testForm() throws {
+        let formFields = ["foo": "bar"]
+        let server = HttpServer()
+        server["/bar"] = { request in
+            XCTAssertEqual(request.method, "POST")
+            XCTAssertEqual(request.headers["content-type"], "application/x-www-form-urlencoded")
+            XCTAssertNotNil(request.headers["content-length"])
+            do {
+                let body = try XCTUnwrap(String(data: Data(request.body), encoding: .utf8))
+                XCTAssertEqual(body, "foo=bar")
+            } catch {
+                XCTFail("Server should be able to parse body")
+            }
+            return .ok(.json(["message": "foo"]))
+        }
+        try server.start(8080)
+        let requester = PaylikeRequester()
+        let valueExpectation = XCTestExpectation(description: "Value should be received")
+        var options = RequestOptions()
+        options.form = true
+        options.formFields = formFields
+        let promise = requester.request(endpoint: "http://localhost:8080/bar", options: options)
+        var bag: Set<AnyCancellable> = []
+        promise.sink(
+            receiveCompletion: { _ in
+            }, receiveValue: { response in
+                do {
+                    let body = try response.getJSONBody()
+                    XCTAssertNotNil(body)
+                    let message = body["message"]! as? String
+                    XCTAssertEqual(message, "foo")
+                } catch {
+                    XCTFail("\(error)")
+                }
+                valueExpectation.fulfill()
+            }).store(in: &bag)
+        wait(for: [valueExpectation], timeout: 30)
+        server.stop()
+    }
 }

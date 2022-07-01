@@ -4,7 +4,7 @@ import Combine
 public struct PaylikeRequester {
     // TODO: Logging, client
     public init() {}
-    func exceuteRequest(request: URLRequest) -> Future<PaylikeResponse, Error> {
+    func executeRequest(request: URLRequest) -> Future<PaylikeResponse, Error> {
         return Future() { promise in
             URLSession.shared.dataTask(with: request) { (data, response, error) in
                 if let error = error {
@@ -36,6 +36,24 @@ public struct PaylikeRequester {
             url = URL(string: endpoint + "?" + queries)!
             request = URLRequest(url: url)
         }
+        if options.form {
+            if options.formFields.isEmpty {
+                return Future { promise in promise(.failure(PaylikeRequestError.FormNeedsFields)) }
+            }
+            let formBodyParts = options.formFields.reduce("") { prev, curr in
+                let encodedValue = String(describing: curr.value.addingPercentEncoding(withAllowedCharacters: .alphanumerics)!)
+                let keyValuePair = "\(curr.key)=\(encodedValue)"
+                if prev.isEmpty {
+                    return keyValuePair
+                }
+                return prev + "&" + keyValuePair
+            }
+            request.httpMethod = "POST"
+            request.httpBody = Data(formBodyParts.data(using: .utf8)!)
+            request.addValue(String(request.httpBody!.count), forHTTPHeaderField: "Content-Length")
+            request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+            return executeRequest(request: request)
+        }
         request.addValue(String(options.version), forHTTPHeaderField: "Accept-Version")
         request.addValue(options.clientId, forHTTPHeaderField: "X-Client")
         if options.method == "POST" && options.data != nil {
@@ -43,6 +61,6 @@ public struct PaylikeRequester {
             request.httpBody = try? JSONSerialization.data(withJSONObject: options.data!)
             request.httpMethod = "POST"
         }
-        return exceuteRequest(request: request)
+        return executeRequest(request: request)
     }
 }

@@ -9,6 +9,11 @@ public enum PaylikeRequestError : Error {
      */
     case ResponseCannotBeSerializedToJSON(response: URLResponse)
     /**
+     Thrown when the request is supposed to be a form
+     but the fields are missing / empty
+     */
+    case FormNeedsFields
+    /**
      Unknown error happened during the request and the response cannot be created
      */
     case UnknownError
