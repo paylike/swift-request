@@ -75,4 +75,37 @@ final class PaylikeRequestTests: XCTestCase {
         wait(for: [valueExpectation], timeout: 30)
         server.stop()
     }
+    
+    func testQuery() throws {
+        let server = HttpServer()
+        server["/bar"] = { request in
+            XCTAssertEqual(request.queryParams.count, 1)
+            let param = request.queryParams.first!
+            XCTAssertEqual(param.0, "foo")
+            XCTAssertEqual(param.1, "bar")
+            return .ok(.json(["message": "foo"]))
+        }
+        try server.start(8080)
+        let requester = PaylikeRequester()
+        let valueExpectation = XCTestExpectation(description: "Value should be received")
+        var options = RequestOptions()
+        options.query = ["foo": "bar"]
+        let promise = requester.request(endpoint: "http://localhost:8080/bar", options: options)
+        var bag: Set<AnyCancellable> = []
+        promise.sink(
+            receiveCompletion: { _ in
+            }, receiveValue: { response in
+                do {
+                    let body = try response.getJSONBody()
+                    XCTAssertNotNil(body)
+                    let message = body["message"]! as? String
+                    XCTAssertEqual(message, "foo")
+                } catch {
+                    XCTFail("\(error)")
+                }
+                valueExpectation.fulfill()
+            }).store(in: &bag)
+        wait(for: [valueExpectation], timeout: 30)
+        server.stop()
+    }
 }

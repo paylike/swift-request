@@ -23,8 +23,19 @@ public struct PaylikeRequester {
      Executes a request based on the endpoint and the optional request options
      */
     public func request(endpoint: String, options: RequestOptions = RequestOptions()) -> Future<PaylikeResponse, Error> {
-        let url = URL(string: endpoint)!
+        var url = URL(string: endpoint)!
         var request = URLRequest(url: url)
+        if !options.query.isEmpty {
+            let queries = options.query.reduce("") { prev, curr in
+                let query = "\(curr.key)=\(curr.value)"
+                if prev.isEmpty {
+                    return query
+                }
+                return prev + "&" + query
+            }
+            url = URL(string: endpoint + "?" + queries)!
+            request = URLRequest(url: url)
+        }
         request.addValue(String(options.version), forHTTPHeaderField: "Accept-Version")
         request.addValue(options.clientId, forHTTPHeaderField: "X-Client")
         if options.method == "POST" && options.data != nil {
