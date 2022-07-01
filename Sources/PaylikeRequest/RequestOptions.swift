@@ -12,40 +12,40 @@ public struct RequestOptions {
      API Version to use
      1 by default
      */
-    public let version = 1
+    public var version = 1
     
     /**
      ClientID that appears when the request is made to the backend
      "swift-1" by default
      */
-    public let clientId = "swift-1"
+    public var clientId = "swift-1"
     
     /**
      Method of the request
-     "GET: by default
+     "GET" by default
      */
-    public let method = "GET"
+    public var method = "GET"
     
     /**
      Query parameters attached to the request
      */
-    public let query: [String: String] = [:]
+    public var query: [String: String] = [:]
     
     /**
      Encodable data to send to the API
      */
-    public let data: Codable? = nil
+    public var data: Codable? = nil
     
     /**
      Indiciates if the request should be sent out as a form or not
      false by default
      */
-    public let form = false
+    public var form = false
     
     /**
      Fields used in the forms
      */
-    public let formFields: [String: String] = [:]
+    public var formFields: [String: String] = [:]
     
     // TODO: TIMEOUT
 }

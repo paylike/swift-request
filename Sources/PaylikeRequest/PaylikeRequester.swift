@@ -23,9 +23,15 @@ public struct PaylikeRequester {
      Executes a request based on the endpoint and the optional request options
      */
     public func request(endpoint: String, options: RequestOptions = RequestOptions()) -> Future<PaylikeResponse, Error> {
-        //create the url with NSURL
-        let url = URL(string: endpoint)! //change the url
-        let request = URLRequest(url: url)
+        let url = URL(string: endpoint)!
+        var request = URLRequest(url: url)
+        request.addValue(String(options.version), forHTTPHeaderField: "Accept-Version")
+        request.addValue(options.clientId, forHTTPHeaderField: "X-Client")
+        if options.method == "POST" && options.data != nil {
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try? JSONSerialization.data(withJSONObject: options.data!)
+            request.httpMethod = "POST"
+        }
         return exceuteRequest(request: request)
     }
 }
