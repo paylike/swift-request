@@ -12,12 +12,15 @@ public struct PaylikeResponse {
     /**
      Data returned in the body
      */
-    public let data: Data
+    public let data: Data?
     /**
      Returns JSON body if possible
      */
     public func getJSONBody() throws -> [String: Any] {
-        guard let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String: Any] else {
+        if data == nil {
+            throw PaylikeRequestError.ResponseCannotBeSerializedToJSON(response: self.response)
+        }
+        guard let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as? [String: Any] else {
             return [:]
         }
         return json
