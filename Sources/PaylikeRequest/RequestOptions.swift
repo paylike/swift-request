@@ -47,5 +47,8 @@ public struct RequestOptions {
      */
     public var formFields: [String: String] = [:]
     
-    // TODO: TIMEOUT
+    /**
+     Timeout interval in the request in seconds
+     */
+    public var timeout: Double = 60
 }

@@ -69,6 +69,7 @@ public struct PaylikeRequester {
             url = URL(string: endpoint + "?" + queries)!
             request = URLRequest(url: url)
         }
+        request.timeoutInterval = options.timeout
         if options.form {
             if options.formFields.isEmpty {
                 return Future { promise in promise(.failure(PaylikeRequestError.FormNeedsFields)) }
@@ -89,7 +90,7 @@ public struct PaylikeRequester {
                 t: "request",
                 method: "POST",
                 url: request.url!.absoluteString,
-                timeout: "TODO",
+                timeout: String(options.timeout),
                 form: String(options.form),
                 formFields: options.formFields,
                 headers: request.allHTTPHeaderFields!
@@ -107,7 +108,7 @@ public struct PaylikeRequester {
             t: "request",
             method: request.httpMethod!,
             url: request.url!.absoluteString,
-            timeout: "TODO",
+            timeout: String(options.timeout),
             form: String(options.form),
             formFields: options.formFields,
             headers: request.allHTTPHeaderFields!

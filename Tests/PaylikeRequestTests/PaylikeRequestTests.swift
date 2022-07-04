@@ -147,4 +147,33 @@ final class PaylikeRequestTests: XCTestCase {
         wait(for: [valueExpectation], timeout: 30)
         server.stop()
     }
+    
+    func testTimeout() throws {
+        let server = HttpServer()
+        server["/bar"] = { request in
+            Thread.sleep(forTimeInterval: 5)
+            return .ok(.json(["message": "foo"]))
+        }
+        try server.start(8080)
+        let expectation = XCTestExpectation(description: "Timeout should be received")
+        var options = RequestOptions()
+        options.timeout = 2
+        let promise = requester.request(endpoint: "http://localhost:8080/bar", options: options)
+        var bag: Set<AnyCancellable> = []
+        promise.sink(
+            receiveCompletion: { completion in
+                switch completion {
+                    case .failure(let error):
+                    if (error as? URLError)?.code == .timedOut {
+                        expectation.fulfill()
+                    }
+                default:
+                    XCTFail("SHould not be able to do completation here")
+                    }
+            }, receiveValue: { response in
+                XCTFail("Should not be able to receive value here")
+            }).store(in: &bag)
+        wait(for: [expectation], timeout: 15)
+        server.stop()
+    }
 }
