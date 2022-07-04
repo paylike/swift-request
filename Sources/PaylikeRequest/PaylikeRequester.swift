@@ -1,9 +1,42 @@
 import Foundation
 import Combine
 
+/**
+ Describes information for a log line
+ */
+struct LoggingOp : Codable {
+    public var t: String
+    public var method: String
+    public var url: String
+    public var timeout: String
+    public var form: String
+    public var formFields: [String: String]
+    public var headers: [String: String]
+}
+
+/**
+ Responsible for sending out requests according to the Paylike API requirements
+ */
 public struct PaylikeRequester {
-    // TODO: Logging, client
+    /**
+     Used for logging, called when the request is constructed
+     */
+    public var loggingFn: (Encodable) -> Void = { obj in
+        print(obj)
+    }
+    /**
+     Use empty init if the default logging is enough for you
+     */
     public init() {}
+    /**
+     Overwrite logging function with your own
+     */
+    public init(log: @escaping (Encodable) -> Void) {
+        self.loggingFn = log
+    }
+    /**
+     Wraps HTTP request execution in a Future
+     */
     func executeRequest(request: URLRequest) -> Future<PaylikeResponse, Error> {
         return Future() { promise in
             URLSession.shared.dataTask(with: request) { (data, response, error) in
@@ -12,7 +45,7 @@ public struct PaylikeRequester {
                     return
                 }
                 if let response = response {
-                    promise(.success(PaylikeResponse(response: response, data: data)))
+                    promise(.success(PaylikeResponse(urlResponse: response, data: data)))
                     return
                 }
                 promise(.failure(PaylikeRequestError.UnknownError))
@@ -52,6 +85,15 @@ public struct PaylikeRequester {
             request.httpBody = Data(formBodyParts.data(using: .utf8)!)
             request.addValue(String(request.httpBody!.count), forHTTPHeaderField: "Content-Length")
             request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+            loggingFn(LoggingOp(
+                t: "request",
+                method: "POST",
+                url: request.url!.absoluteString,
+                timeout: "TODO",
+                form: String(options.form),
+                formFields: options.formFields,
+                headers: request.allHTTPHeaderFields!
+            ))
             return executeRequest(request: request)
         }
         request.addValue(String(options.version), forHTTPHeaderField: "Accept-Version")
@@ -61,6 +103,15 @@ public struct PaylikeRequester {
             request.httpBody = try? JSONSerialization.data(withJSONObject: options.data!)
             request.httpMethod = "POST"
         }
+        loggingFn(LoggingOp(
+            t: "request",
+            method: request.httpMethod!,
+            url: request.url!.absoluteString,
+            timeout: "TODO",
+            form: String(options.form),
+            formFields: options.formFields,
+            headers: request.allHTTPHeaderFields!
+        ))
         return executeRequest(request: request)
     }
 }

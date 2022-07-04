@@ -4,6 +4,9 @@ import Combine
 import Swifter
 
 final class PaylikeRequestTests: XCTestCase {
+    let requester = PaylikeRequester(log: { item in
+        // Don't log in tests
+    })
     func testDefaultGetRequest() throws {
         let server = HttpServer()
         server["/bar"] = { request in
@@ -13,7 +16,6 @@ final class PaylikeRequestTests: XCTestCase {
             return .ok(.json(["message": "foo"]))
         }
         try server.start(8080)
-        let requester = PaylikeRequester()
         let valueExpectation = XCTestExpectation(description: "Value should be received")
         let promise = requester.request(endpoint: "http://localhost:8080/bar")
         var bag: Set<AnyCancellable> = []
@@ -52,7 +54,6 @@ final class PaylikeRequestTests: XCTestCase {
             return .ok(.json(["message": "foo"]))
         }
         try server.start(8080)
-        let requester = PaylikeRequester()
         let valueExpectation = XCTestExpectation(description: "Value should be received")
         var options = RequestOptions()
         options.method = "POST"
@@ -86,7 +87,6 @@ final class PaylikeRequestTests: XCTestCase {
             return .ok(.json(["message": "foo"]))
         }
         try server.start(8080)
-        let requester = PaylikeRequester()
         let valueExpectation = XCTestExpectation(description: "Value should be received")
         var options = RequestOptions()
         options.query = ["foo": "bar"]
@@ -125,7 +125,6 @@ final class PaylikeRequestTests: XCTestCase {
             return .ok(.json(["message": "foo"]))
         }
         try server.start(8080)
-        let requester = PaylikeRequester()
         let valueExpectation = XCTestExpectation(description: "Value should be received")
         var options = RequestOptions()
         options.form = true

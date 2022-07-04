@@ -8,7 +8,7 @@ public struct PaylikeResponse {
     /**
      The underlying response information
      */
-    public let response: URLResponse
+    public let urlResponse: URLResponse
     /**
      Data returned in the body
      */
@@ -18,7 +18,7 @@ public struct PaylikeResponse {
      */
     public func getJSONBody() throws -> [String: Any] {
         if data == nil {
-            throw PaylikeRequestError.ResponseCannotBeSerializedToJSON(response: self.response)
+            throw PaylikeRequestError.ResponseCannotBeSerializedToJSON(response: urlResponse)
         }
         guard let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as? [String: Any] else {
             return [:]
