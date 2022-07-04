@@ -17,6 +17,7 @@ struct LoggingOp : Codable {
 /**
  Responsible for sending out requests according to the Paylike API requirements
  */
+@available(iOS 13.0, macOS 10.15, *)
 public struct PaylikeRequester {
     /**
      Used for logging, called when the request is constructed
@@ -37,6 +38,7 @@ public struct PaylikeRequester {
     /**
      Wraps HTTP request execution in a Future
      */
+    @available(iOS 13.0, macOS 10.15, *)
     func executeRequest(request: URLRequest) -> Future<PaylikeResponse, Error> {
         return Future() { promise in
             URLSession.shared.dataTask(with: request) { (data, response, error) in
@@ -55,6 +57,7 @@ public struct PaylikeRequester {
     /**
      Executes a request based on the endpoint and the optional request options
      */
+    @available(iOS 13.0, macOS 10.15, *)
     public func request(endpoint: String, options: RequestOptions = RequestOptions()) -> Future<PaylikeResponse, Error> {
         var url = URL(string: endpoint)!
         var request = URLRequest(url: url)
