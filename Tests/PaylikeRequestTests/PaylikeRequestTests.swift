@@ -163,13 +163,12 @@ final class PaylikeRequestTests: XCTestCase {
         promise.sink(
             receiveCompletion: { completion in
                 switch completion {
-                    case .failure(let error):
-                    if (error as? URLError)?.code == .timedOut {
-                        expectation.fulfill()
-                    }
+                case .failure(let error):
+                    XCTAssertEqual((error as? URLError)?.code, .timedOut)
+                    expectation.fulfill()
                 default:
                     XCTFail("SHould not be able to do completation here")
-                    }
+                }
             }, receiveValue: { response in
                 XCTFail("Should not be able to receive value here")
             }).store(in: &bag)
