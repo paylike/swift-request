@@ -55,9 +55,7 @@ final class PaylikeRequestTests: XCTestCase {
         }
         try server.start(8080)
         let valueExpectation = XCTestExpectation(description: "Value should be received")
-        var options = RequestOptions()
-        options.method = "POST"
-        options.data = postData
+        let options = RequestOptions().withData(try JSONEncoder().encode(postData))
         let promise = requester.request(endpoint: "http://localhost:8080/bar", options: options)
         var bag: Set<AnyCancellable> = []
         promise.sink(
@@ -88,7 +86,7 @@ final class PaylikeRequestTests: XCTestCase {
         }
         try server.start(8080)
         let valueExpectation = XCTestExpectation(description: "Value should be received")
-        var options = RequestOptions()
+        let options = RequestOptions()
         options.query = ["foo": "bar"]
         let promise = requester.request(endpoint: "http://localhost:8080/bar", options: options)
         var bag: Set<AnyCancellable> = []
@@ -126,7 +124,7 @@ final class PaylikeRequestTests: XCTestCase {
         }
         try server.start(8080)
         let valueExpectation = XCTestExpectation(description: "Value should be received")
-        var options = RequestOptions()
+        let options = RequestOptions()
         options.form = true
         options.formFields = formFields
         let promise = requester.request(endpoint: "http://localhost:8080/bar", options: options)
@@ -176,6 +174,7 @@ final class PaylikeRequestTests: XCTestCase {
             expectation.fulfill()
         }).store(in: &bag)
         wait(for: [expectation], timeout: 15)
+        server.stop()
     }
     
     func testTimeout() throws {
@@ -186,7 +185,7 @@ final class PaylikeRequestTests: XCTestCase {
         }
         try server.start(8080)
         let expectation = XCTestExpectation(description: "Timeout should be received")
-        var options = RequestOptions()
+        let options = RequestOptions()
         options.timeout = 2
         let promise = requester.request(endpoint: "http://localhost:8080/bar", options: options)
         var bag: Set<AnyCancellable> = []

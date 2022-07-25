@@ -104,7 +104,7 @@ public struct PaylikeRequester {
         request.addValue(options.clientId, forHTTPHeaderField: "X-Client")
         if options.method == "POST" && options.data != nil {
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.httpBody = try? JSONSerialization.data(withJSONObject: options.data!)
+            request.httpBody = options.data!
             request.httpMethod = "POST"
         }
         loggingFn(LoggingOp(

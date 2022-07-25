@@ -3,7 +3,7 @@ import Foundation
 /**
  Describes options for a given request
  */
-public struct RequestOptions {
+public class RequestOptions {
     /**
      Use this initalizer for completely default options
      */
@@ -34,7 +34,16 @@ public struct RequestOptions {
     /**
      Encodable data to send to the API
      */
-    public var data: Codable? = nil
+    public var data: Data? = nil
+    
+    /**
+     Adds data and sets it to a POST method
+     */
+    public func withData(_ data: Data) -> RequestOptions {
+        self.data = data
+        self.method = "POST"
+        return self
+    }
     
     /**
      Indiciates if the request should be sent out as a form or not
