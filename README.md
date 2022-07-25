@@ -9,7 +9,7 @@ This implementation is based on [Paylike/JS-Request](https://github.com/paylike/
 __SPM__:
 ```swift
 // dependencies: 
-.package(url: "git@github.com:paylike/swift-request.git", .upToNextMajor(from: "0.1.0")
+.package(url: "git@github.com:paylike/swift-request.git", .upToNextMajor(from: "0.2.0"))
 
 // target:
 .product(name: "PaylikeRequest", package: "swift-request")

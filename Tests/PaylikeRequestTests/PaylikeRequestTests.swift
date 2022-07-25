@@ -148,6 +148,36 @@ final class PaylikeRequestTests: XCTestCase {
         server.stop()
     }
     
+    func testResponseString() throws {
+        let server = HttpServer()
+        let text = "some custom text"
+        server["/bar"] = { request in
+            return .ok(.text(text))
+        }
+        let expectation = XCTestExpectation(description: "Should be able to parse body")
+        try server.start(8080)
+        let promise = requester.request(endpoint: "http://localhost:8080/bar", options: RequestOptions())
+        var bag: Set<AnyCancellable> = []
+        promise.sink(receiveCompletion: { completion in
+            switch completion {
+            case .failure(let error):
+                XCTFail("Should not error out: " + error.localizedDescription)
+            default:
+                return
+            }
+        }, receiveValue: { response in
+            do {
+                let body = try response.getStringBody()
+                XCTAssertEqual(body, text)
+            } catch {
+                XCTFail("Body deserialization should not error out")
+            }
+            bag.removeAll()
+            expectation.fulfill()
+        }).store(in: &bag)
+        wait(for: [expectation], timeout: 15)
+    }
+    
     func testTimeout() throws {
         let server = HttpServer()
         server["/bar"] = { request in

@@ -5,9 +5,13 @@ import Foundation
  */
 public enum PaylikeRequestError : Error {
     /**
-     Happens when the input is considered an unsafe integer
+     Happens when the response body cannot be deserialized to JSON
      */
     case ResponseCannotBeSerializedToJSON(response: URLResponse)
+    /**
+     Happens when the response body is empty and / or cannot be represented as a String
+     */
+    case ResponseCannotBeSerializedToString(response: URLResponse)
     /**
      Thrown when the request is supposed to be a form
      but the fields are missing / empty

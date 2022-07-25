@@ -21,8 +21,20 @@ public struct PaylikeResponse {
             throw PaylikeRequestError.ResponseCannotBeSerializedToJSON(response: urlResponse)
         }
         guard let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as? [String: Any] else {
-            return [:]
+            throw PaylikeRequestError.ResponseCannotBeSerializedToJSON(response: urlResponse)
         }
         return json
+    }
+    /**
+     Returns body as string if possible
+     */
+    public func getStringBody() throws -> String {
+        if data == nil {
+            throw PaylikeRequestError.ResponseCannotBeSerializedToString(response: urlResponse)
+        }
+        guard let body = String(data: data!, encoding: String.Encoding.utf8) else {
+            throw PaylikeRequestError.ResponseCannotBeSerializedToString(response: urlResponse)
+        }
+        return body
     }
 }
