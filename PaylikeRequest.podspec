@@ -11,7 +11,10 @@ interface to handle requests towards the Paylike server API
   s.homepage         = 'https://github.com/paylike/swift-request'
   s.license          = { :type => 'BSD-3', :file => 'LICENSE' }
   s.author           = { 'Paylike.io' => 'info@paylike.io' }
-  s.source           = { :git => 'https://github.com/paylike/swift-request.git', :tag => s.version.to_s }
+  s.source           = {
+  :git => 'https://github.com/paylike/swift-request.git',
+  :tag => s.version.to_s
+  }
   s.ios.deployment_target = '13.0'
   s.source_files = 'Sources/PaylikeRequest/**/*'
   s.dependency 'Swifter'
