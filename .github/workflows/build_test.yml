@@ -13,11 +13,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - name: Build
       run: 
-        touch ~/publickey
-        echo ${{ secrets.DEPENDENCY_SSH_PUBLIC_KEY }} > ~/publickey
-        ssh-add ~/publickey
         swift build -v
     - name: Run tests
       run: swift test -v
