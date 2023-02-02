@@ -13,9 +13,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - uses: webfactory/ssh-agent@v0.7.0
+    - uses: tanmancan/action-setup-ssh-agent-key@1.0.0
       with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        ssh-public-key: ${{ secrets.SSH_PUBLIC_KEY }}
     - name: Build
       run: 
         swift build -v
