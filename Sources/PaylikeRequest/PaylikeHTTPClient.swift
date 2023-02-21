@@ -8,9 +8,16 @@ public struct PaylikeHTTPClient {
     /**
      * Used for logging, called when the request is constructed
      */
-    public var loggingFn: (Encodable) -> Void = { obj in
-        print("HTTP Client logger:", terminator: " ")
-        debugPrint(obj)
+    public var loggingFn: (Encodable) -> Void
+    
+    /**
+     * Public initialization with default logging function
+     */
+    public init() {
+        loggingFn = { obj in
+            print("HTTP Client logger:", terminator: " ")
+            debugPrint(obj)
+        }
     }
     
     /**
