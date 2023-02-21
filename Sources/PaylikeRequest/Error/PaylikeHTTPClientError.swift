@@ -8,7 +8,6 @@ public enum PaylikeHTTPClientError : Error {
      * Unknown error happened during the request and the response cannot be created
      */
     case UnknownError
-    
     /**
      * Thrown when received query could not be parsed to url
      */
@@ -25,7 +24,6 @@ public enum PaylikeHTTPClientError : Error {
      * Thrown when the request is supposed to have data but it's empty
      */
     case DataIsEmpty
-    
     /**
      Happens when the response body cannot be deserialized to JSON
      */
