@@ -14,18 +14,6 @@ public struct PaylikeHTTPClient {
     }
     
     /**
-     * Use empty init if the default logging is enough for you
-     */
-    public init() {}
-    
-    /**
-     * Overwrite logging function with your own
-     */
-    public init(log: @escaping (Encodable) -> Void) {
-        self.loggingFn = log
-    }
-    
-    /**
      * Executes a request based on the endpoint and the optional request options
      */
     @available(iOS 13.0, macOS 10.15, *)

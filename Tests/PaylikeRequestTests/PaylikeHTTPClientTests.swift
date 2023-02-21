@@ -6,14 +6,18 @@ import XCTest
 
 final class PaylikeHTTPClientTests: XCTestCase {
     
-    /**
-     * Initializing HTTP client without logging, we do not log in tests
-     */
-    let paylikeHTTPClient = PaylikeHTTPClient(
-                log: { _ in
-                    // do nothing
-                }
-    )
+    var paylikeHTTPClient = PaylikeHTTPClient()
+    
+    convenience override init() {
+        self.init()
+
+        /**
+         * Initializing HTTP client without logging. We do not log in tests
+         */
+        paylikeHTTPClient.loggingFn = { obj in
+            // do nothing
+        }
+    }
     
     func testDefaultGetRequest() throws {
         let swiftyServer = HttpServer()
@@ -32,7 +36,7 @@ final class PaylikeHTTPClientTests: XCTestCase {
                 to: URL(string: "http://localhost:8080/bar")!
             )
             valueExpectation.fulfill()
-
+            
             do {
                 let body = try swiftyResponse.getJSONBody()
                 XCTAssertNotNil(body)
@@ -49,7 +53,7 @@ final class PaylikeHTTPClientTests: XCTestCase {
     }
     
     func testPostJSONData() throws {
-
+        
         let postData = ["message": "bar"]
         
         let swiftyServer = HttpServer()
