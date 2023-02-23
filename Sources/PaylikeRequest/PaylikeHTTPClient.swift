@@ -3,7 +3,6 @@ import Foundation
 /**
  * Responsible for sending out requests according to the Paylike API requirements
  */
-@available(iOS 13.0, macOS 10.15, *)
 public struct PaylikeHTTPClient {
     /**
      * Used for logging, called when the request is constructed
@@ -23,11 +22,59 @@ public struct PaylikeHTTPClient {
     /**
      * Executes a request based on the endpoint and the optional request options
      */
-    @available(iOS 13.0, macOS 10.15, *)
+    @available(swift 5.5)
     public func sendRequest(
         to endpoint: URL,
         withOptions options: RequestOptions = RequestOptions()
     ) async throws -> PaylikeResponse {
+        
+        let request = try buildRequest(to: endpoint, withOptions: options)
+        
+        /**
+         * Tries and executes async request and rethrow error
+         */
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            return PaylikeResponse(data: data, urlResponse: response)
+        } catch {
+            // @TODO: handle api errors? or just send up and catch it later?
+            print(error.localizedDescription) //@TODO: is it antipattern to print here? probably is...
+            throw error
+        }
+    }
+    
+    @available(swift, deprecated: 5.5, message: "Use async version if possible")
+    public func sendRequest(
+        to endpoint: URL,
+        withOptions options: RequestOptions = RequestOptions(),
+        completion handler: @escaping (Result<PaylikeResponse, Error>) -> Void
+    ) -> Void {
+        do {
+            let request = try buildRequest(to: endpoint, withOptions: options)
+            /**
+             * Executes request and returns `PaylikeResponse` or `error` or `PaylikeHTTPClientError.UnknownError`
+             */
+            URLSession.shared.dataTask(with: request) { (data, response, error) in
+                if let error = error {
+                    handler(.failure(error))
+                    return
+                }
+                guard let response = response else {
+                    handler(.failure(PaylikeHTTPClientError.UnknownError))
+                    return
+                }
+                handler(.success(PaylikeResponse(data: data, urlResponse: response)))
+            }.resume()
+        } catch {
+            handler(.failure(error))
+            return Void()
+        }
+    }
+    
+    private func buildRequest(
+        to endpoint: URL,
+        withOptions options: RequestOptions
+    ) throws -> URLRequest {
         
         /**
          * Set the correct url based on
@@ -39,23 +86,18 @@ public struct PaylikeHTTPClient {
             if (query.isEmpty) {
                 throw PaylikeHTTPClientError.QueryIsEmpty
             }
-            if #available(iOS 16.0, macOS 13.0, *) {
-                query.forEach { key, value in
-                    url.append(queryItems: [URLQueryItem(name: key, value: value)])
-                }
-            } else {
-                let queryString = query.reduce("") { prev, curr in
-                    let query = "\(curr.key)=\(curr.value)"
-                    if prev.isEmpty {
-                        return query
-                    }
-                    return prev + "&" + query
-                }
-                guard let newURL = URL(string: "?" + String(queryString), relativeTo: url) else {
-                    throw PaylikeHTTPClientError.QueryToURLParsingError(query: queryString)
-                }
-                url = newURL
+            var queryItems: [URLQueryItem] = []
+            query.forEach { key, value in
+                queryItems.append(URLQueryItem(name: key, value: value))
             }
+            guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+                throw PaylikeHTTPClientError.InvalidBaseURL(url)
+            }
+            urlComponents.queryItems = queryItems
+            guard let newUrl = urlComponents.url else {
+                throw PaylikeHTTPClientError.UnknownError // @TODO: adequate error
+            }
+            url = newUrl
         }
         
         /**
@@ -107,16 +149,6 @@ public struct PaylikeHTTPClient {
             headers: request.allHTTPHeaderFields!
         ))
         
-        /**
-         * Try and execute async request and rethrow error
-         */
-        do {
-            let (data, response) = try await URLSession.shared.data(for: request)
-            return PaylikeResponse(data: data, urlResponse: response)
-        } catch {
-            // @TODO: handle api errors? or just send up and catch it later?
-            print(error.localizedDescription) //@TODO: is it antipattern to print here? probably is...
-            throw error
-        }
+        return request
     }
 }

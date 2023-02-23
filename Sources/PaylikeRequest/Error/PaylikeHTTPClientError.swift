@@ -17,6 +17,10 @@ public enum PaylikeHTTPClientError : Error {
      */
     case QueryIsEmpty
     /**
+     * Thrown when the URL is invalid
+     */
+    case InvalidBaseURL(_ url: URL)
+    /**
      * Thrown when the request is supposed to be a form but the fields are missing / empty
      */
     case FormIsEmpty
