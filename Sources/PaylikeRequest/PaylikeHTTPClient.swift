@@ -3,7 +3,7 @@ import Foundation
 /**
  * Describing the necessary function for the HTTP client
  */
-protocol HTTPClient {
+public protocol HTTPClient {
     
     @available(swift 5.5)
     func sendRequest(
