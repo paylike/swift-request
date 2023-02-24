@@ -1,9 +1,28 @@
 import Foundation
 
 /**
+ * Describing the necessary function for the HTTP client
+ */
+protocol HTTPClient {
+    
+    @available(swift 5.5)
+    func sendRequest(
+        to endpoint: URL,
+        withOptions options: RequestOptions
+    ) async throws -> PaylikeResponse
+    
+    @available(swift, deprecated: 5.5, message: "Use async version if possible")
+    func sendRequest(
+        to endpoint: URL,
+        withOptions options: RequestOptions,
+        completion handler: @escaping (Result<PaylikeResponse, Error>) -> Void
+    ) -> Void
+}
+
+/**
  * Responsible for sending out requests according to the Paylike API requirements
  */
-public struct PaylikeHTTPClient {
+public struct PaylikeHTTPClient : HTTPClient {
     /**
      * Used for logging, called when the request is constructed
      */
@@ -67,7 +86,6 @@ public struct PaylikeHTTPClient {
             }.resume()
         } catch {
             handler(.failure(error))
-            return Void()
         }
     }
     
