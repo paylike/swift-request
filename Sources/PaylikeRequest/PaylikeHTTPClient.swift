@@ -22,7 +22,7 @@ public protocol HTTPClient {
 /**
  * Responsible for sending out requests according to the Paylike API requirements
  */
-public struct PaylikeHTTPClient : HTTPClient {
+public final class PaylikeHTTPClient : HTTPClient {
     /**
      * Used for logging, called when the request is constructed
      */
