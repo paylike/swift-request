@@ -13,15 +13,16 @@ public struct PaylikeResponse {
      */
     public let urlResponse: URLResponse
     
+    /// @TODO: put parsing to higher level http client?
     /**
      * Returns JSON body if possible
      */
     public func getJSONBody() throws -> [String: Any] {
         if data == nil {
-            throw PaylikeHTTPClientError.ResponseCannotBeSerializedToJSON(response: urlResponse)
+            throw HTTPClientError.ResponseCannotBeSerializedToJSON(urlResponse)
         }
         guard let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as? [String: Any] else {
-            throw PaylikeHTTPClientError.ResponseCannotBeSerializedToJSON(response: urlResponse)
+            throw HTTPClientError.ResponseCannotBeSerializedToJSON(urlResponse)
         }
         return json
     }
@@ -30,10 +31,10 @@ public struct PaylikeResponse {
      */
     public func getStringBody() throws -> String {
         if data == nil {
-            throw PaylikeHTTPClientError.ResponseCannotBeSerializedToString(response: urlResponse)
+            throw HTTPClientError.ResponseCannotBeSerializedToString(urlResponse)
         }
         guard let body = String(data: data!, encoding: String.Encoding.utf8) else {
-            throw PaylikeHTTPClientError.ResponseCannotBeSerializedToString(response: urlResponse)
+            throw HTTPClientError.ResponseCannotBeSerializedToString(urlResponse)
         }
         return body
     }

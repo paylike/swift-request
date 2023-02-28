@@ -1,7 +1,7 @@
 /**
  * Api error codes sent by the Paylike backend
  */
-public enum ErrorCodes : String, Decodable {
+public enum PaylikeErrorCodes : String, Decodable {
     case APPLEPAY_TOKEN_INVALID
     case APPLEPAY_VALIDATION_URL_INVALID
     case APPLEPAY_CONFIGURATION_INVALID
