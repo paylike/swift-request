@@ -5,38 +5,29 @@ extension PaylikeHTTPClient {
     /**
      * Executes a request based on the endpoint and the optional request options
      */
-    @available(swift 5.5)
-    public func sendRequest(
-        to endpoint: URL,
-        withOptions options: RequestOptions = RequestOptions()
-    ) async throws -> PaylikeResponse {
-        
-        let request = try buildRequest(to: endpoint, withOptions: options)
-        
-        /**
-         * Tries and executes async request and rethrow error
-         */
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let response = response as? HTTPURLResponse else {
-            throw HTTPClientError.NotHTTPURLResponse(response)
-        }
-        return PaylikeResponse(data: data, urlResponse: response)
-    }
-    
-    /**
-     * Executes a request based on the endpoint and the optional request options
-     */
-    @available(swift, deprecated: 5.5, message: "Use async version if possible")
     public func sendRequest(
         to endpoint: URL,
         withOptions options: RequestOptions = RequestOptions(),
         completion handler: @escaping (Result<PaylikeResponse, Error>) -> Void
     ) -> Void {
         do {
+            /*
+             * Get necessary request
+             */
             let request = try buildRequest(to: endpoint, withOptions: options)
-            /**
-             * Executes request and returns `PaylikeResponse` or `error` or `PaylikeHTTPClientError.UnknownError`
+            /*
+             * Logging the request to be made
+             */
+            loggingFn(LoggingFormat(
+                t: "Created request:",
+                url: request.url!.absoluteString,
+                method: request.httpMethod!,
+                timeout: String(request.timeoutInterval),
+                formFields: options.formFields,
+                headers: request.allHTTPHeaderFields!
+            ))
+            /*
+             * Executes request and returns `PaylikeResponse(data:urlResponse)` or `error` or `PaylikeHTTPClientError.NoHTTPResponse(error:data:)`
              */
             URLSession.shared.dataTask(with: request) { (data, response, error) in
                 if let error = error {
@@ -54,6 +45,24 @@ extension PaylikeHTTPClient {
         }
     }
     
+    /**
+     * `sendRequest(to:withOption:completion)` wrapped in `async` syntax
+     */
+    @available(iOS 13.0, macOS 10.15, *)
+    public func sendRequest(
+        to endpoint: URL,
+        withOptions options: RequestOptions = RequestOptions()
+    ) async throws -> PaylikeResponse {
+        return try await withCheckedThrowingContinuation { continuation in
+            sendRequest(to: endpoint, withOptions: options) { response in
+                continuation.resume(with: response)
+            }
+        }
+    }
+    
+    /**
+     * Builds `URLRequest` based on the parameters
+     */
     private func buildRequest(
         to endpoint: URL,
         withOptions options: RequestOptions
@@ -110,19 +119,6 @@ extension PaylikeHTTPClient {
             request.httpBody = data
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         }
-        
-        /**
-         * Logging the request to be made
-         */
-        loggingFn(LoggingFormat(
-            t: "Created request:",
-            url: url.absoluteString,
-            method: request.httpMethod!,
-            timeout: String(request.timeoutInterval),
-            formFields: options.formFields,
-            headers: request.allHTTPHeaderFields!
-        ))
-        
         return request
     }
 }
