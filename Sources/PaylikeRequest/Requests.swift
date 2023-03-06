@@ -68,7 +68,7 @@ extension PaylikeHTTPClient {
         withOptions options: RequestOptions
     ) throws -> URLRequest {
         
-        /**
+        /*
          * Set the correct url based on
          * - endpoint
          * - options.query
@@ -89,7 +89,7 @@ extension PaylikeHTTPClient {
             url = newUrl
         }
         
-        /**
+        /*
          * Set the correct URLRequest fields based on
          * - url
          * - options

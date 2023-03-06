@@ -14,7 +14,7 @@ public protocol HTTPClient {
      * Executes a request based on the endpoint and the optional request options.
      * Using swift concurrency
      */
-    @available(swift 5.5)
+    @available(iOS 13.0, macOS 10.15, *)
     func sendRequest(
         to endpoint: URL,
         withOptions options: RequestOptions
@@ -24,7 +24,6 @@ public protocol HTTPClient {
      * Executes a request based on the endpoint and the optional request options.
      * Using completion handler solution
      */
-    @available(swift, deprecated: 5.5, message: "Use async version if possible")
     func sendRequest(
         to endpoint: URL,
         withOptions options: RequestOptions,
@@ -36,6 +35,7 @@ public protocol HTTPClient {
  * Responsible for sending out requests according to the Paylike API requirements
  */
 public final class PaylikeHTTPClient : HTTPClient {
+    
     /**
      * Used for logging, called when the request is constructed
      */
