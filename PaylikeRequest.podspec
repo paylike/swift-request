@@ -1,6 +1,7 @@
 Pod::Spec.new do |s|
   s.name             = 'PaylikeRequest'
   s.swift_version    = '5.0'
+  s.ios.deployment_target = '13.0'
   s.version          = '0.3.1'
   s.summary          = 'Utility package to make requests towards the Paylike ecosystem'
   s.description      = <<-DESC
@@ -15,7 +16,6 @@ interface to handle requests towards the Paylike server API
   :git => 'https://github.com/paylike/swift-request.git',
   :tag => s.version.to_s
   }
-  s.ios.deployment_target = '15.0'
   s.source_files = 'Sources/PaylikeRequest/**/*'
   s.dependency 'Swifter'
 end
