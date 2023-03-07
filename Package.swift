@@ -12,7 +12,7 @@ let package = Package(
         .package(url: "git@github.com:httpswift/swifter.git", .upToNextMajor(from: "1.5.0"))
     ],
     targets: [
-        .target(name: "PaylikeRequest", dependencies: [.product(name: "Swifter", package: "swifter")]),
+        .target(name: "PaylikeRequest", dependencies: []),
         .testTarget(
             name: "PaylikeRequestTests",
             dependencies: [
@@ -21,5 +21,5 @@ let package = Package(
             ]
         )
     ],
-    swiftLanguageVersions: [.v4]
+    swiftLanguageVersions: [.v5]
 )

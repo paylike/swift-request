@@ -11,7 +11,7 @@ This implementation is based on [Paylike/JS-Request](https://github.com/paylike/
 __SPM__:
 ```swift
 // dependencies: 
-.package(url: "git@github.com:paylike/swift-request.git", .upToNextMajor(from: "0.2.0"))
+.package(url: "git@github.com:paylike/swift-request.git", .upToNextMajor(from: "0.3.0"))
 
 // target:
 .product(name: "PaylikeRequest", package: "swift-request")
@@ -28,18 +28,41 @@ pod 'PaylikeRequest'
 ```swift
 import PaylikeRequest
 
-// ....
+// ...
 
-let requester = PaylikeRequester(log: { item in
+// optionally logging function can be overwritten
+let httpClient = PaylikeHTTPClient(log: { item in
     print(item) // Item is encodable
 })
-let options = RequestOptions()
-options.method = "POST"
-options.data = ["foo": "bar"]
 
-let promise = requester.request(endpoint: "http://localhost:8080/bar", options: options)
+let options = RequestOptions(
+    withData: ["foo": "bar"]
+)
+
+// completion handler version
+httpClient.sendRequest(
+    to: URL(string: "http://localhost:8080/bar")!,
+    withOptions: options
+) { result in
+    // handle result in callback style
+}
+
+// Async version
+Task {
+    let response = try await httpClient.sendRequest(
+        to: URL(string: "http://localhost:8080/bar")!,
+        withOptions: options
+    )
+}
 
 // A more simple usage with options default parameters:
+
 // ...
-let promise = requester.request(endpoint: "http://localhost:8080/bar")
+
+Task {
+    let response = try await httpClient.sendRequest(
+        to: URL(string: "http://localhost:8080/bar")!
+    )
+}
+
 ```
