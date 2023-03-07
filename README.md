@@ -39,6 +39,15 @@ let options = RequestOptions(
     withData: ["foo": "bar"]
 )
 
+// completion handler version
+httpClient.sendRequest(
+    to: URL(string: "http://localhost:8080/bar")!,
+    withOptions: options
+) { result in
+    // handle result in callback style
+}
+
+// Async version
 Task {
     let response = try await httpClient.sendRequest(
         to: URL(string: "http://localhost:8080/bar")!,
