@@ -17,5 +17,4 @@ interface to handle requests towards the Paylike server API
   :tag => s.version.to_s
   }
   s.source_files = 'Sources/PaylikeRequest/**/*'
-  s.dependency 'Swifter'
 end
