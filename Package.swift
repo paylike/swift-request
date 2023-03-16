@@ -9,7 +9,7 @@ let package = Package(
         .library(name: "PaylikeRequest", targets: ["PaylikeRequest"]),
     ],
     dependencies: [
-        .package(url: "git@github.com:httpswift/swifter.git", .upToNextMajor(from: "1.5.0"))
+        .package(url: "https://github.com/httpswift/swifter.git", .upToNextMajor(from: "1.5.0"))
     ],
     targets: [
         .target(name: "PaylikeRequest", dependencies: []),
