@@ -1,6 +1,6 @@
 # PaylikeRequest - Paylike low-level request helper
 
-[![build_test](/swift-request/actions/workflows/build_test.yml/badge.svg?branch=main)](/swift-request/actions/workflows/build_test.yml)
+[![build_test](https://github.com/.../.../actions/workflows/build_test.yml/badge.svg?branch=main)](https://github.com/.../.../actions/workflows/build_test.yml)
 
 Request implementation for Swift
 
