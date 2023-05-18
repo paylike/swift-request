@@ -20,14 +20,6 @@ public enum HTTPClientError : Error, LocalizedError {
      * Thrown when `dataTask` does not give response
      */
     case NoHTTPResponse(_ error: Error?, _ data: Data?)
-    /**
-     Happens when the response body cannot be deserialized to JSON
-     */
-    case ResponseCannotBeSerializedToJSON(_ response: URLResponse)
-    /**
-     Happens when the response body is empty and / or cannot be represented as a String
-     */
-    case ResponseCannotBeSerializedToString(_ response: URLResponse)
     
     /**
      * Localized text of the error messages
@@ -42,10 +34,6 @@ public enum HTTPClientError : Error, LocalizedError {
                 return "Not HTTP URL response"
             case .NoHTTPResponse(_, _):
                 return "Not HTTP Resposne"
-            case .ResponseCannotBeSerializedToJSON(_):
-                return "Response cannot be serialized to JSON"
-            case .ResponseCannotBeSerializedToString(_):
-                return "Response cannto be serialized to String"
         }
     }
 }
