@@ -1,5 +1,9 @@
 /**
- * Api error codes sent by the Paylike backend
+ * HTTP Server status codes
+ *
+ * These error codes are sent by the Paylike backend server
+ *
+ * [More info](https://github.com/paylike/api-reference/blob/main/status-codes.md)
  */
 public enum PaylikeErrorCodes : String, Decodable {
     case APPLEPAY_TOKEN_INVALID

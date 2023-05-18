@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
   s.name             = 'PaylikeRequest'
   s.swift_version    = '5.0'
   s.ios.deployment_target = '13.0'
-  s.version          = '0.3.1'
+  s.version          = '0.3.2'
   s.summary          = 'Utility package to make requests towards the Paylike ecosystem'
   s.description      = <<-DESC
 This packages is a clone of the JS version and responsible for providing a handy

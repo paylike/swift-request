@@ -1,9 +1,9 @@
 import Foundation
 
 /**
- Describes errors regarding the library
+ * Describes errors regarding the HTTP Client and it's close components
  */
-public enum HTTPClientError : Error {
+public enum HTTPClientError : Error, LocalizedError {
     /**
      * Unknown error happened during the request and the response cannot be created
      */
@@ -20,12 +20,20 @@ public enum HTTPClientError : Error {
      * Thrown when `dataTask` does not give response
      */
     case NoHTTPResponse(_ error: Error?, _ data: Data?)
+    
     /**
-     Happens when the response body cannot be deserialized to JSON
+     * Localized text of the error messages
      */
-    case ResponseCannotBeSerializedToJSON(_ response: URLResponse)
-    /**
-     Happens when the response body is empty and / or cannot be represented as a String
-     */
-    case ResponseCannotBeSerializedToString(_ response: URLResponse)
+    public var errorDescription: String? {
+        switch self {
+            case .UnknownError:
+                return "UnknownError"
+            case .InvalidURL(url: let url):
+                return "Invalid URL: \(url.absoluteString)"
+            case .NotHTTPURLResponse(_):
+                return "Not HTTP URL response"
+            case .NoHTTPResponse(_, _):
+                return "Not HTTP Resposne"
+        }
+    }
 }

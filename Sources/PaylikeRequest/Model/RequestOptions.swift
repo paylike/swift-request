@@ -9,8 +9,7 @@ public struct RequestOptions {
      */
     public var query: [String: String]?
     /**
-     * Timeout interval in the request in seconds
-     * Default is 60 based on URLRequest default.
+     * Timeout interval in the request in seconds. Default is 60 based on URLRequest default.
      */
     public var timeoutInterval: Double?
     /**
@@ -22,9 +21,7 @@ public struct RequestOptions {
      */
     public var clientId = "swift-1"
     /**
-     * Method of the request
-     * "GET" by default
-     * "POST" if data or formfields are used
+     * Method of the request, Paylike APIs require "GET" or "POST"
      */
     public let httpMethod: String
     /**
@@ -37,8 +34,7 @@ public struct RequestOptions {
     public let formFields: [String: String]?
     
     /**
-     * Initialization with default settings
-     *  - method = "GET"
+     * Initialization with method = "GET"
      */
     public init() {
         self.httpMethod = "GET"
@@ -46,9 +42,7 @@ public struct RequestOptions {
         self.formFields = nil
     }
     /**
-     * Initialization with
-     * - method = "POST"
-     * - data: Data
+     * Initialization with method = "POST"
      */
     public init(withData data: Data) {
         self.httpMethod = "POST"
@@ -56,9 +50,7 @@ public struct RequestOptions {
         self.formFields = nil
     }
     /**
-     * Initialization with
-     * - method = "POST
-     * - formFields: [String: String]
+     * Initialization with method = "POST"
      */
     public init(withFormFields formFields: [String: String]) {
         self.httpMethod = "POST"

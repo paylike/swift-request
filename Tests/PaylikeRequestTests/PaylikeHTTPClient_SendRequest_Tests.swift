@@ -32,9 +32,9 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
         PaylikeHTTPClient_SendRequest_Tests.paylikeHTTPClient.sendRequest(to: URL(string: "http://localhost:8080/bar")!) { result in
             do {
                 let response = try result.get()
-                let body = try response.getJSONBody()
+                let body = try JSONSerialization.jsonObject(with: response.data!, options: .mutableContainers) as? [String: Any]
                 XCTAssertNotNil(body)
-                let message = body["message"]! as? String
+                let message = body!["message"]! as? String
                 XCTAssertEqual(message, "foo")
             } catch {
                 XCTFail("\(error)")
@@ -54,35 +54,35 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
             return .ok(.json(["message": "foo"]))
         }
         try swiftyServer.start(8080)
-        
+
         let valueExpectation = XCTestExpectation(description: "Value should be received")
-        
+
         Task {
             let swiftyResponse = try await PaylikeHTTPClient_SendRequest_Tests.paylikeHTTPClient.sendRequest(
                 to: URL(string: "http://localhost:8080/bar")!
             )
-            
+
             do {
-                let body = try swiftyResponse.getJSONBody()
+                let body = try JSONSerialization.jsonObject(with: swiftyResponse.data!, options: .mutableContainers) as? [String: Any]
                 XCTAssertNotNil(body)
-                let message = body["message"]! as? String
+                let message = body!["message"]! as? String
                 XCTAssertEqual(message, "foo")
             } catch {
                 XCTFail("\(error)")
             }
-            
+
             swiftyServer.stop()
             valueExpectation.fulfill()
         }
         wait(for: [valueExpectation], timeout: 2)
     }
-    
+
     func testPostJSONData() throws {
-        
+
         let postData = ["message": "bar"]
-        
+
         let data = try! JSONEncoder().encode(postData)
-        
+
         let swiftyServer = HttpServer()
         swiftyServer["/bar"] = { request in
             XCTAssertEqual(request.method, "POST")
@@ -99,18 +99,18 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
             return .ok(.json(["message": "foo"]))
         }
         try swiftyServer.start(8080)
-        
+
         let valueExpectation = XCTestExpectation(description: "Value should be received")
-        
+
         PaylikeHTTPClient_SendRequest_Tests.paylikeHTTPClient.sendRequest(
             to: URL(string: "http://localhost:8080/bar")!,
             withOptions: RequestOptions(withData: data)
         ) { result in
             do {
                 let response = try result.get()
-                let body = try response.getJSONBody()
+                let body = try JSONSerialization.jsonObject(with: response.data!, options: .mutableContainers) as? [String: Any]
                 XCTAssertNotNil(body)
-                let message = body["message"]! as? String
+                let message = body!["message"]! as? String
                 XCTAssertEqual(message, "foo")
             } catch {
                 XCTFail("\(error)")
@@ -120,11 +120,11 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
         }
         wait(for: [valueExpectation], timeout: 2)
     }
-    
+
     func testPostJSONData_async() throws {
-        
+
         let postData = ["message": "bar"]
-        
+
         let swiftyServer = HttpServer()
         swiftyServer["/bar"] = { request in
             XCTAssertEqual(request.method, "POST")
@@ -141,30 +141,30 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
             return .ok(.json(["message": "foo"]))
         }
         try swiftyServer.start(8080)
-        
+
         let valueExpectation = XCTestExpectation(description: "Value should be received")
-        
+
         Task {
             let swiftyResponse = try await PaylikeHTTPClient_SendRequest_Tests.paylikeHTTPClient.sendRequest(
                 to: URL(string: "http://localhost:8080/bar")!,
                 withOptions: RequestOptions(withData: JSONEncoder().encode(postData))
             )
-            
+
             do {
-                let body = try swiftyResponse.getJSONBody()
+                let body = try JSONSerialization.jsonObject(with: swiftyResponse.data!, options: .mutableContainers) as? [String: Any]
                 XCTAssertNotNil(body)
-                let message = body["message"]! as? String
+                let message = body!["message"]! as? String
                 XCTAssertEqual(message, "foo")
             } catch {
                 XCTFail("\(error)")
             }
-            
+
             swiftyServer.stop()
             valueExpectation.fulfill()
         }
         wait(for: [valueExpectation], timeout: 2)
     }
-    
+
     func testQuery() throws {
         let swiftyServer = HttpServer()
         swiftyServer["/bar"] = { request in
@@ -175,21 +175,21 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
             return .ok(.json(["message": "foo"]))
         }
         try swiftyServer.start(8080)
-        
+
         let valueExpectation = XCTestExpectation(description: "Value should be received")
-        
+
         var options = RequestOptions()
         options.query = ["foo": "bar"]
-        
+
         PaylikeHTTPClient_SendRequest_Tests.paylikeHTTPClient.sendRequest(
             to: URL(string: "http://localhost:8080/bar")!,
             withOptions: options
         ) { result in
             do {
                 let response = try result.get()
-                let body = try response.getJSONBody()
+                let body = try JSONSerialization.jsonObject(with: response.data!, options: .mutableContainers) as? [String: Any]
                 XCTAssertNotNil(body)
-                let message = body["message"]! as? String
+                let message = body!["message"]! as? String
                 XCTAssertEqual(message, "foo")
             } catch {
                 XCTFail("\(error)")
@@ -199,7 +199,7 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
         }
         wait(for: [valueExpectation], timeout: 2)
     }
-    
+
     func testQuery_async() throws {
         let swiftyServer = HttpServer()
         swiftyServer["/bar"] = { request in
@@ -210,23 +210,23 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
             return .ok(.json(["message": "foo"]))
         }
         try swiftyServer.start(8080)
-        
+
         let valueExpectation = XCTestExpectation(description: "Value should be received")
-        
+
         Task {
-            
+
             var options = RequestOptions()
             options.query = ["foo": "bar"]
-            
+
             let swiftyResponse = try await PaylikeHTTPClient_SendRequest_Tests.paylikeHTTPClient.sendRequest(
                 to: URL(string: "http://localhost:8080/bar")!,
                 withOptions: options
             )
-            
+
             do {
-                let body = try swiftyResponse.getJSONBody()
+                let body = try JSONSerialization.jsonObject(with: swiftyResponse.data!, options: .mutableContainers) as? [String: Any]
                 XCTAssertNotNil(body)
-                let message = body["message"]! as? String
+                let message = body!["message"]! as? String
                 XCTAssertEqual(message, "foo")
             } catch {
                 XCTFail("\(error)")
@@ -236,11 +236,11 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
         }
         wait(for: [valueExpectation], timeout: 2)
     }
-    
+
     func testForm() throws {
-        
+
         let formFields = ["foo": "bar"]
-        
+
         let server = HttpServer()
         server["/bar"] = { request in
             XCTAssertEqual(request.method, "POST")
@@ -255,20 +255,20 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
             return .ok(.json(["message": "foo"]))
         }
         try server.start(8080)
-        
+
         let valueExpectation = XCTestExpectation(description: "Value should be received")
-        
+
         let options = RequestOptions(withFormFields: formFields)
-        
+
         PaylikeHTTPClient_SendRequest_Tests.paylikeHTTPClient.sendRequest(
             to: URL(string: "http://localhost:8080/bar")!,
             withOptions: options
         ) { result in
             do {
                 let response = try result.get()
-                let body = try response.getJSONBody()
+                let body = try JSONSerialization.jsonObject(with: response.data!, options: .mutableContainers) as? [String: Any]
                 XCTAssertNotNil(body)
-                let message = body["message"]! as? String
+                let message = body!["message"]! as? String
                 XCTAssertEqual(message, "foo")
             } catch {
                 XCTFail("\(error)")
@@ -278,11 +278,11 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
         }
         wait(for: [valueExpectation], timeout: 2)
     }
-    
+
     func testForm_async() throws {
-        
+
         let formFields = ["foo": "bar"]
-        
+
         let server = HttpServer()
         server["/bar"] = { request in
             XCTAssertEqual(request.method, "POST")
@@ -297,21 +297,21 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
             return .ok(.json(["message": "foo"]))
         }
         try server.start(8080)
-        
+
         let valueExpectation = XCTestExpectation(description: "Value should be received")
-        
+
         let options = RequestOptions(withFormFields: formFields)
-        
+
         Task {
             let swiftyResponse = try await PaylikeHTTPClient_SendRequest_Tests.paylikeHTTPClient.sendRequest(
                 to: URL(string: "http://localhost:8080/bar")!,
                 withOptions: options
             )
-            
+
             do {
-                let body = try swiftyResponse.getJSONBody()
+                let body = try JSONSerialization.jsonObject(with: swiftyResponse.data!, options: .mutableContainers) as? [String: Any]
                 XCTAssertNotNil(body)
-                let message = body["message"]! as? String
+                let message = body!["message"]! as? String
                 XCTAssertEqual(message, "foo")
             } catch {
                 XCTFail("\(error)")
@@ -321,25 +321,25 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
         }
         wait(for: [valueExpectation], timeout: 2)
     }
-    
+
     func testResponseString() throws {
-        
+
         let text = "some custom text"
-        
+
         let swiftyServer = HttpServer()
         swiftyServer["/bar"] = { request in
             return .ok(.text(text))
         }
         try swiftyServer.start(8080)
-        
+
         let expectation = XCTestExpectation(description: "Should be able to parse body")
-        
+
         PaylikeHTTPClient_SendRequest_Tests.paylikeHTTPClient.sendRequest(
             to: URL(string: "http://localhost:8080/bar")!
         ) { result in
             do {
                 let response = try result.get()
-                let body = try response.getStringBody()
+                let body = String(data: response.data!, encoding: .utf8)
                 XCTAssertEqual(body, text)
             } catch {
                 XCTFail("Body deserialization should not error out")
@@ -349,25 +349,25 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
         }
         wait(for: [expectation], timeout: 2)
     }
-    
+
     func testResponseString_async() throws {
-        
+
         let text = "some custom text"
-        
+
         let swiftyServer = HttpServer()
         swiftyServer["/bar"] = { request in
             return .ok(.text(text))
         }
         try swiftyServer.start(8080)
-        
+
         let expectation = XCTestExpectation(description: "Should be able to parse body")
-        
+
         Task {
-            let swiftyResponse = try await PaylikeHTTPClient_SendRequest_Tests.paylikeHTTPClient.sendRequest(
-                to: URL(string: "http://localhost:8080/bar")!
-            )
             do {
-                let body = try swiftyResponse.getStringBody()
+                let swiftyResponse = try await PaylikeHTTPClient_SendRequest_Tests.paylikeHTTPClient.sendRequest(
+                    to: URL(string: "http://localhost:8080/bar")!
+                )
+                let body = String(data: swiftyResponse.data!, encoding: .utf8)
                 XCTAssertEqual(body, text)
             } catch {
                 XCTFail("Body deserialization should not error out")
@@ -377,7 +377,7 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
         }
         wait(for: [expectation], timeout: 2)
     }
-    
+
     func testTimeout() throws {
         let server = HttpServer()
         server["/bar"] = { request in
@@ -385,12 +385,12 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
             return .ok(.json(["message": "foo"]))
         }
         try server.start(8080)
-        
+
         let expectation = XCTestExpectation(description: "Timeout should be received")
-        
+
         var options = RequestOptions()
         options.timeoutInterval = 2
-        
+
         PaylikeHTTPClient_SendRequest_Tests.paylikeHTTPClient.sendRequest(
             to: URL(string: "http://localhost:8080/bar")!,
             withOptions: options
@@ -406,7 +406,7 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
         }
         wait(for: [expectation], timeout: 5)
     }
-    
+
     func testTimeout_async() throws {
         let server = HttpServer()
         server["/bar"] = { request in
@@ -414,13 +414,13 @@ final class PaylikeHTTPClient_SendRequest_Tests: XCTestCase {
             return .ok(.json(["message": "foo"]))
         }
         try server.start(8080)
-        
+
         let expectation = XCTestExpectation(description: "Timeout should be received")
-        
+
         Task {
             var options = RequestOptions()
             options.timeoutInterval = 2
-            
+
             do {
                 _ = try await PaylikeHTTPClient_SendRequest_Tests.paylikeHTTPClient.sendRequest(
                     to: URL(string: "http://localhost:8080/bar")!,
